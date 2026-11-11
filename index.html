@@ -27,11 +27,6 @@
     </div>
     <script>
         (function() {
-            // 1. 读 URL 参数（token = 短码 + 步骤序号）与访问标识
-            const params = new URLSearchParams(location.search);
-            const t = params.get('t') || '';
-            const v = params.get('v') || generateTraceId();
-
             // 生成 16 位唯一访问标识
             function generateTraceId() {
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -41,6 +36,20 @@
                 }
                 return s;
             }
+
+            // 1. 读 URL 参数：优先 query（?t=&v=），兼容 hash（/#/?t=&v=）
+            function readShareParams() {
+                const search = new URLSearchParams(location.search);
+                const hash = location.hash || '';
+                const hashQuery = hash.includes('?') ? hash.slice(hash.indexOf('?') + 1) : '';
+                const fromHash = new URLSearchParams(hashQuery);
+                return {
+                    t: search.get('t') || fromHash.get('t') || '',
+                    v: search.get('v') || fromHash.get('v') || generateTraceId()
+                };
+            }
+
+            const { t, v } = readShareParams();
 
             // 2. 点击按钮：一次调用 oauth-jump，后端解析下一步链接并返回微信授权地址，直接跳转
             document.getElementById('authBtn').addEventListener('click', function() {

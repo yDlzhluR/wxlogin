@@ -50,10 +50,11 @@
             }
 
             const { t, v } = readShareParams();
+            const apiBase = 'https://javaapi.tthaol.com';
 
-            // 2. 点击按钮：一次调用 oauth-jump，后端解析下一步链接并返回微信授权地址，直接跳转
+            // 只取微信授权地址。授权成功后由 oauth-callback 302 到壳子页，这里不要再请求下一步
             document.getElementById('authBtn').addEventListener('click', function() {
-                fetch(`https://javaapi.tthaol.com/app-api/site/share/oauth-jump?type=31&t=${encodeURIComponent(t)}&v=${encodeURIComponent(v)}`)
+                fetch(`${apiBase}/app-api/site/share/oauth-jump?type=31&t=${encodeURIComponent(t)}&v=${encodeURIComponent(v)}`)
                     .then(res => res.json())
                     .then(oauthData => {
                         if (oauthData && oauthData.code === 0 && oauthData.data) {
